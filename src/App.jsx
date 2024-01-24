@@ -1,23 +1,22 @@
 import React from 'react'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Home from './routes/Home'
 import About from './routes/About'
-import Header from './components/Header'
+import TheHeader from './components/TheHeader'
 
 const App = () => {
 	return (
 		<Router>
-			<Switch>
+			<Routes>
 				<Route
 					path="/"
-					exact
-					component={Home}
+					element={Home}
 				/>
 				<Route
 					path="/about"
-					component={About}
+					element={About}
 				/>
-			</Switch>
+			</Routes>
 		</Router>
 	)
 }

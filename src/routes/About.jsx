@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import about from '../store/about'
+import { about } from '../store/about'
 
 export default function About() {
 	const { intro, name, email, blog } = about
