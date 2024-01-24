@@ -4,17 +4,10 @@ import useTodoStore from '../store/todos'
 const AddTodo = () => {
 	const [task, setTask] = useState('')
 	const [date, setDate] = useState('')
-	const [loading, setLoading] = useState(todoStore.state.loading)
+	const createTodo = useTodoStore(state => state.createTodo)
+	const loading = useTodoStore(state => state.loading)
 	const MAX_INPUT_LENGTH = 13
 	const titleSpliter = '##'
-
-	useEffect(() => {
-		const unsubscribe = todoStore.subscribe('loading', () => {
-			setLoading(todoStore.state.loading)
-		})
-
-		return () => unsubscribe()
-	}, [])
 
 	const handleTaskChange = e => {
 		const inputValue = e.target.value.slice(0, MAX_INPUT_LENGTH)
@@ -24,6 +17,8 @@ const AddTodo = () => {
 	const handleAddClick = () => {
 		const title = task + titleSpliter + date
 		createTodo(title)
+		setTask('')
+		setDate('')
 	}
 
 	return (
@@ -51,7 +46,9 @@ const AddTodo = () => {
 					) : (
 						<button
 							className="add"
-							onClick={handleAddClick}>
+							onClick={handleAddClick}
+							disabled={loading} // Disable the button when loading
+						>
 							<span className="material-symbols-outlined">add</span>
 						</button>
 					)}
