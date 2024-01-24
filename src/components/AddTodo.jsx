@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { createTodo, todoStore } from '../store/todos'
+import useTodoStore from '../store/todos'
 
 const AddTodo = () => {
 	const [task, setTask] = useState('')

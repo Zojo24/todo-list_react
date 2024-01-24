@@ -4,7 +4,7 @@ import Home from './routes/Home'
 import About from './routes/About'
 import TheHeader from './components/TheHeader'
 
-const App = () => {
+function App() {
 	return (
 		<Router>
 			<Routes>

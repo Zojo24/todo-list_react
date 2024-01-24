@@ -1,5 +1,5 @@
 import React from 'react'
-import { deleteTodo, updateTodo } from '../store/todos'
+import useTodoStore from '../store/todos'
 
 const titleSpliter = '##'
 

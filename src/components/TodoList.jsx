@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { readTodo, deleteAllTodo, reorderTodo } from '../store/todos'
+import useTodoStore from '../store/todos'
 import TodoItem from './TodoItem'
 
 const SECOND_TO_MS = 100
