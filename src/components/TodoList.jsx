@@ -5,16 +5,14 @@ import TodoItem from './TodoItem'
 const SECOND_TO_MS = 100
 
 const TodoList = () => {
-	const [todoItems, setTodoItems] = useState([])
+	const todoItems = useTodoStore(state => state.todoItems) // Access todoItems state
+	const readTodo = useTodoStore(state => state.readTodo) // Access readTodo action
+	const deleteAllTodo = useTodoStore(state => state.deleteAllTodo) // Access deleteAllTodo action
+	const [filter, setFilter] = useState('all') // Added state for filter
 
 	useEffect(() => {
 		readTodo()
-		const subscription = todoStore.subscribe('todoItems', () => {
-			setTodoItems(todoStore.state.todoItems)
-		})
-
-		return () => subscription.unsubscribe()
-	}, [])
+	}, [readTodo]) // readTodo as a dependency
 
 	const handleDeleteAll = () => {
 		const completedIds = todoItems
