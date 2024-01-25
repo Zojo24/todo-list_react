@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { about } from '../store/about'
 
 export default function About() {
@@ -10,7 +10,13 @@ export default function About() {
 					src="/about.png"
 					alt="toss bank"
 				/>
-				<p className="intro">{intro}</p>
+				{intro.map((paragraph, index) => (
+					<p
+						key={index}
+						className="intro">
+						{paragraph}
+					</p>
+				))}
 				<div className="developer">
 					<span className="developer_intro">개발자</span>
 					<img
