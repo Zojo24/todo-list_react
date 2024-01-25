@@ -5,14 +5,14 @@ import TodoItem from './TodoItem'
 const SECOND_TO_MS = 100
 
 const TodoList = () => {
-	const todoItems = useTodoStore(state => state.todoItems) // Access todoItems state
-	const readTodo = useTodoStore(state => state.readTodo) // Access readTodo action
-	const deleteAllTodo = useTodoStore(state => state.deleteAllTodo) // Access deleteAllTodo action
-	const [filter, setFilter] = useState('all') // Added state for filter
+	const todoItems = useTodoStore(state => state.todoItems)
+	const readTodo = useTodoStore(state => state.readTodo)
+	const deleteAllTodo = useTodoStore(state => state.deleteAllTodo)
+	const [filter, setFilter] = useState('all')
 
 	useEffect(() => {
 		readTodo()
-	}, [readTodo]) // readTodo as a dependency
+	}, [readTodo])
 
 	const handleDeleteAll = () => {
 		const completedIds = todoItems

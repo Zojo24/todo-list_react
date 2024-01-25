@@ -1,20 +1,27 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import useTodoStore from '../store/todos'
 
 const titleSpliter = '##'
 
 const TodoItem = ({ todoItem }) => {
-	const handleDelete = () => {
-		deleteTodo(todoItem.id)
-	}
+	const { deleteTodo, updateTodo } = useTodoStore()
+	const [task, setTask] = useState(todoItem.title.split(titleSpliter)[0])
+	const [date, setDate] = useState(todoItem.title.split(titleSpliter)[1])
+	const [done, setDone] = useState(todoItem.done)
+
+	useEffect(() => {
+		setTask(todoItem.title.split(titleSpliter)[0])
+		setDate(todoItem.title.split(titleSpliter)[1])
+		setDone(todoItem.done)
+	}, [todoItem])
 
 	const handleUpdate = () => {
-		const taskInput = document.querySelector('.task-input').value
-		const dateInput = document.querySelector('.date-input').value
-		const statusInput = document.querySelector('.status-input').value
-		const done = statusInput === 'false'
-		const title = taskInput + titleSpliter + dateInput
+		const title = task + titleSpliter + date
 		updateTodo(todoItem.id, title, done)
+	}
+
+	const handleDelete = () => {
+		deleteTodo(todoItem.id)
 	}
 
 	return (
@@ -37,20 +44,23 @@ const TodoItem = ({ todoItem }) => {
 					<li className="edit-task__item">
 						<input
 							className="task-input"
-							defaultValue={todoItem.title.split(titleSpliter)[0]}
+							value={task}
+							onChange={e => setTask(e.target.value)}
 						/>
 					</li>
 					<li className="edit-task__item">
 						<input
 							className="date-input"
 							type="date"
-							defaultValue={todoItem.title.split(titleSpliter)[1]}
+							value={date}
+							onChange={e => setDate(e.target.value)}
 						/>
 					</li>
 					<li className="edit-task__item">
 						<select
 							className="status-input"
-							defaultValue={todoItem.done.toString()}>
+							value={done.toString()}
+							onChange={e => setDone(e.target.value === 'true')}>
 							<option
 								className="task-active"
 								value="true">

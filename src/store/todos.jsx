@@ -33,21 +33,31 @@ const useTodoStore = create(set => ({
 	},
 
 	updateTodo: async (id, title, done) => {
-		await customFetch(`/${id}`, {
-			method: 'PUT',
-			body: JSON.stringify({
-				title,
-				done
+		try {
+			set({ loading: true })
+			const response = await customFetch(`/${id}`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ title, done })
 			})
-		})
-		set({ loading: true })
-		await set(prevState => ({
-			todoItems: prevState.todoItems.map(item =>
-				item.id === id ? { ...item, title, done } : item
-			),
-			loading: false
-		}))
+			if (!response.ok) {
+				throw new Error('Network response was not ok')
+			}
+
+			set(prevState => ({
+				todoItems: prevState.todoItems.map(item =>
+					item.id === id ? { ...item, title, done } : item
+				)
+			}))
+		} catch (error) {
+			console.error('Failed to update todo:', error)
+		} finally {
+			set({ loading: false })
+		}
 	},
+
 	deleteTodo: async id => {
 		await customFetch(`/${id}`, {
 			method: 'DELETE'
