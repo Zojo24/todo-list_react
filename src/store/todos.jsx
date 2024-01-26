@@ -1,102 +1,117 @@
 import { create } from 'zustand'
-import { customFetch } from '../utils/fetchUtils'
+import { devtools } from 'zustand/middleware'
 
-const useTodoStore = create(set => ({
-	todoItems: [],
-	loading: false,
-	createTodo: async title => {
-		try {
-			await customFetch('/', {
-				method: 'POST',
-				body: JSON.stringify({
-					title
-				})
-			})
-			set({ loading: true })
-			await useTodoStore.getState().readTodo()
-			set({ loading: false })
-		} catch (error) {
-			console.error('createTodo error:', error)
-		}
-	},
-	readTodo: async () => {
-		set({ loading: true })
-		try {
-			const response = await customFetch('/', {
-				method: 'GET'
-			})
-			set({ todoItems: response, loading: false })
-		} catch (error) {
-			console.error('Error in readTodo:', error)
-			set({ loading: false })
-		}
-	},
+const useTodoStore = create(
+	devtools((set, get) => ({
+		todoItems: [],
+		loading: false,
 
-	updateTodo: async (id, title, done) => {
-		try {
-			set({ loading: true })
-			const response = await customFetch(`/${id}`, {
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ title, done })
-			})
-			if (!response.ok) {
-				throw new Error('Network response was not ok')
+		setLoading: loading => set({ loading }),
+
+		setTodoItems: todoItems => set({ todoItems }),
+
+		customFetch: async (url, options) => {
+			try {
+				const response = await fetch(url, options)
+				if (!response.ok) {
+					throw new Error('Network response was not ok')
+				}
+				return response.json()
+			} catch (error) {
+				console.error('Network error:', error)
+				throw ErrorEvent
 			}
-
-			set(prevState => ({
-				todoItems: prevState.todoItems.map(item =>
-					item.id === id ? { ...item, title, done } : item
+		},
+		readTodo: async () => {
+			get().setLoading(true)
+			try {
+				const response = await get().customFetch(
+					`https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos`,
+					{
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json',
+							apikey: 'KDT7_GrZ1eYBo',
+							username: 'KDT7_ChoiHongJoo'
+						}
+					}
 				)
-			}))
-		} catch (error) {
-			console.error('Failed to update todo:', error)
-		} finally {
-			set({ loading: false })
-		}
-	},
 
-	deleteTodo: async id => {
-		await customFetch(`/${id}`, {
-			method: 'DELETE'
-		})
-		set({ loading: true })
-		await set(prevState => ({
-			todoItems: prevState.todoItems.filter(item => item.id !== id),
-			loading: false
-		}))
-	},
-	deleteAllTodo: async todoIds => {
-		await customFetch(`/deletions`, {
-			method: 'DELETE',
-			body: JSON.stringify({
-				todoIds
-			})
-		})
-		set({ loading: true })
-		await set(prevState => ({
-			todoItems: prevState.todoItems.filter(item => !todoIds.includes(item.id)),
-			loading: false
-		}))
-	},
-	reorderTodo: async todoIds => {
-		await customFetch(`/reorder`, {
-			method: 'PUT',
-			body: JSON.stringify({
-				todoIds
-			})
-		})
-		set({ loading: true })
-		await set(prevState => ({
-			todoItems: prevState.todoItems.slice().sort((a, b) => {
-				const aIndex = todoIds.indexOf(a.id)
-				const bIndex = todoIds.indexOf(b.id)
-				return aIndex - bIndex
-			}),
-			loading: false
-		}))
-	}
-}))
+				if (Array.isArray(response)) {
+					get().setTodoItems(response)
+				} else {
+					console.error('Expected an array of todos, but received:', response)
+					get().setTodoItems([])
+				}
+			} catch (error) {
+				console.error('Error in readTodo:', error)
+				get().setTodoItems([])
+			} finally {
+				get().setLoading(false)
+			}
+		},
+		updateTodo: async (id, title, done) => {
+			try {
+				await get().customFetch(
+					`https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${id}`,
+					{
+						method: 'PUT',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify({ title, done })
+					}
+				)
+				get().readTodo()
+			} catch (error) {
+				console.error(`Error updating todo with ID ${id}:`, error)
+			}
+		},
+
+		deleteTodo: async id => {
+			try {
+				await get().customFetch(
+					`https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${id}`,
+					{
+						method: 'DELETE'
+					}
+				)
+				get().readTodo()
+			} catch (error) {
+				console.error(`Error deleting todo with ID ${id}:`, error)
+			}
+		},
+
+		deleteAllTodo: async todoIds => {
+			try {
+				await get().customFetch(
+					`https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/deletions`,
+					{
+						method: 'DELETE',
+						body: JSON.stringify({ todoIds })
+					}
+				)
+				get().readTodo()
+			} catch (error) {
+				console.error('Error deleting all todos:', error)
+			}
+		},
+
+		reorderTodo: async todoIds => {
+			try {
+				await get().customFetch(
+					`https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/reorder`,
+					{
+						method: 'PUT',
+						body: JSON.stringify({ todoIds })
+					}
+				)
+				get().readTodo()
+			} catch (error) {
+				console.error('Error reordering todos:', error)
+			}
+		}
+	}))
+)
+
 export default useTodoStore
