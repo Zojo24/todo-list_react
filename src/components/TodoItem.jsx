@@ -60,7 +60,7 @@ const TodoItem = ({ todoItem }) => {
 						<select
 							className="status-input"
 							value={done.toString()}
-							onChange={e => setDone(e.target.value === 'true')}>
+							onChange={e => setDone(e.target.value === 'false')}>
 							<option
 								className="task-active"
 								value="true">

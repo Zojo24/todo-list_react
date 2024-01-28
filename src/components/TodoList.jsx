@@ -6,6 +6,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 const SECOND_TO_MS = 100
 
 const TodoList = () => {
+	const [todoItemsFromState, setTodoItemsFromState] = useState([])
 	const todoItems = useTodoStore(state => state.todoItems)
 	const readTodo = useTodoStore(state => state.readTodo)
 	const deleteAllTodo = useTodoStore(state => state.deleteAllTodo)
@@ -17,8 +18,8 @@ const TodoList = () => {
 	}, [readTodo])
 
 	useEffect(() => {
-		setPageList(todoItems)
-	}, [todoItems])
+		setPageList(todoItemsFromState)
+	}, [todoItemsFromState])
 
 	const handleDeleteAll = () => {
 		const completedIds = todoItems
@@ -27,7 +28,7 @@ const TodoList = () => {
 		deleteAllTodo(completedIds)
 	}
 
-	const filteredItems = todoItems.filter(item => {
+	const filteredItems = todoItemsArray.filter(item => {
 		if (filter === 'all') return true
 		if (filter === 'active') return !item.done
 		if (filter === 'completed') return item.done
@@ -107,7 +108,7 @@ const TodoList = () => {
 			</div>
 
 			<div className="todo-item">
-				{pageList.map(todoItem => (
+				{filteredItems.map(todoItem => (
 					<TodoItem
 						key={todoItem.id}
 						todoItem={todoItem}
